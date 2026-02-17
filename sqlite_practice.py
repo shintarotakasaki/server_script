@@ -16,16 +16,20 @@ def test_DB():
         conn = sqlite3.connect(':memory:')
         cursor = conn.cursor()
 
-        cursor.execute('CREATE TABLE sqlite_practice (' \
-        'id INTEGER PRIMARY KEY AUTOINCREMENT,' \
-        'CPU_temp TEXT,CPU_per TEXT,' \
-        'GPU_temp TEXT,GPU_per TEXT,' \
-        'RAM_temp TEXT,RAM_per TEXT,' \
-        'SSD_temp TEXT,' \
-        'LAN_temp TEXT' \
-        'timestomp  TEXT')
-        #cursor.execute('INSERT INTO temp_test(GPU_temp) VALUES(?)',(GPU_ondo))
-        conn.commit()
+        cursor.execute('''
+            CREATE TABLE server_databace (
+        
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CPU_temp REAL,CPU_per REAL,
+                GPU_temp REAL,GPU_per REAL,
+                RAM_temp REAL,RAM_per REAL,
+                SSD_temp REAL,
+                LAN_temp REAL,
+                timestamp  TEXT
+        
+            )''')
+        
+
         return conn
     
     except Exception as e:
@@ -43,8 +47,8 @@ def psutil_gettemp():
 
         gputemp_cmd = "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits"
         gpuusage_cmd = "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits"
-        GPU_temp = subprocess.check_output(gputemp_cmd.split()).decode('utf-8').strip() 
-        GPU_usage = subprocess.check_output(gpuusage_cmd.split()).decode('utf-8').strip() 
+        GPU_temp = float(subprocess.check_output(gputemp_cmd.split()).decode('utf-8').strip())
+        GPU_usage = float(subprocess.check_output(gpuusage_cmd.split()).decode('utf-8').strip())
 
         RAM_temp = mtb_datas['spd5118'][0].current         # RAM ()
         ram_data = psutil.virtual_memory()
@@ -54,7 +58,7 @@ def psutil_gettemp():
 
         LAN_temp = mtb_datas['r8169_0_b00:00'][0].current  # LAM ()
         
-        NOW = datetime.datetime.now()
+        NOW = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         return CPU_temp , CPU_usage , GPU_temp , GPU_usage , RAM_temp , RAM_usage , SSD_temp , LAN_temp , NOW
     
@@ -68,9 +72,23 @@ if __name__ == "__main__":
     start = time.time()
     psutil.cpu_percent(interval = None)
     Sever_datas = psutil_gettemp()
-    DB = test_DB
-    DB_cursor = DB.sursor()
-    print({Sever_datas})
+    DB = test_DB()
+    DB_cursor = DB.cursor()
+    DB_cursor.execute('''
+        INSERT INTO server_databace(
+                            
+            CPU_temp , CPU_per ,
+            GPU_temp , GPU_per ,
+            RAM_temp , RAM_per ,
+            SSD_temp ,
+            LAN_temp ,
+            timestamp 
+ 
+        )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
+    DB.commit()
+    DB_cursor.execute('SELECT * FROM server_databace')
+    #print(DB_cursor.fetchall())
+
     end = time.time()
 
     syorizikan = end - start

@@ -1,6 +1,6 @@
 import sqlite3
 import datetime
-import sever_script.main_tempget as main_tempget
+import main_tempget
 
 def rog_DB(gpu_kaeriti):
     try:
