@@ -85,7 +85,8 @@ def psutil_gettemp():
 if __name__ == "__main__":
     
     INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
-    COUNT_LIMIT = 0 #ログカントリミット(60回)
+    COUNT_RUN = 0 #While roop カウント用
+    COUNT_LIMIT = 60 #While roopカントリミット(60回)
     start_time = time.time()
     next_time = time.time()
     psutil.cpu_percent(interval = None)
@@ -110,7 +111,7 @@ if __name__ == "__main__":
                 )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
         
             DB.commit()
-            COUNT_LIMIT += 1
+            COUNT_RUN += 1
 
             next_time += INTERVAL_SEC
             sleep_time = next_time - time.time()
@@ -118,7 +119,7 @@ if __name__ == "__main__":
                 time.sleep(sleep_time)
 
 
-            if COUNT_LIMIT >= 3:
+            if COUNT_RUN >= COUNT_LIMIT:
                     DB_cursor.execute('SELECT * FROM server_databace')
                     print(DB_cursor.fetchall())
                     break
@@ -142,3 +143,6 @@ if __name__ == "__main__":
     #ループ処理はそのあと作ればいいや
 
     #2026/2/18 sqlやっとできた...
+
+    #2026/2/19 なんかループが思った以上にサクっとできてびっくりしている、成長しているのか？？？
+    #※AIのおかげだから増長しないように
