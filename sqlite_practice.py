@@ -86,7 +86,7 @@ if __name__ == "__main__":
     
     INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
     COUNT_RUN = 0 #While roop カウント用
-    COUNT_LIMIT = 60 #While roopカントリミット(60回)
+    COUNT_LIMIT = 10 #While roopカントリミット(60回)
     start_time = time.time()
     next_time = time.time()
     psutil.cpu_percent(interval = None)
@@ -120,15 +120,25 @@ if __name__ == "__main__":
 
 
             if COUNT_RUN >= COUNT_LIMIT:
-                    DB_cursor.execute('SELECT * FROM server_databace')
-                    print(DB_cursor.fetchall())
+                    DB_cursor.execute('SELECT * FROM server_databace') #print test
+                    print(DB_cursor.fetchall()) #print test
                     break
         
         elif  Sever_datas is None:
             print(f"Sever_datas is None(While roop error)")
             break
     
-
+    DB_cursor.execute('''
+                    SELECT 
+                        ROUND(AVG(CPU_temp), 1), ROUND(AVG(CPU_per), 1),
+                        ROUND(AVG(GPU_temp), 1), ROUND(AVG(GPU_per), 1),
+                        ROUND(AVG(RAM_temp), 1), ROUND(AVG(RAM_per), 1),
+                        ROUND(AVG(SSD_temp), 1),
+                        ROUND(AVG(LAN_temp), 1)
+                    FROM server_databace
+                ''')
+    
+    print(f"サマリー{DB_cursor.fetchall()}")
 
     end_time = time.time()
 
