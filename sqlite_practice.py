@@ -29,6 +29,21 @@ def test_DB():
         
             )''')
         
+        
+        #DB_cursor.execute('''
+            #INSERT INTO server_databace(
+                            
+                #CPU_temp , CPU_per ,
+                #GPU_temp , GPU_per ,
+                #RAM_temp , RAM_per ,
+                #SSD_temp ,
+                #LAN_temp ,
+                #timestamp 
+ 
+        #)VALUES(?,?,?,?,?,?,?,?,?)''',)
+        
+
+        conn.commit()
 
         return conn
     
@@ -58,7 +73,7 @@ def psutil_gettemp():
 
         LAN_temp = mtb_datas['r8169_0_b00:00'][0].current  # LAM ()
         
-        NOW = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        NOW = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
         return CPU_temp , CPU_usage , GPU_temp , GPU_usage , RAM_temp , RAM_usage , SSD_temp , LAN_temp , NOW
     
@@ -68,30 +83,55 @@ def psutil_gettemp():
         return None , None , None , None , None , None , None , None , None
     
 if __name__ == "__main__":
- 
-    start = time.time()
+    
+    INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
+    COUNT_LIMIT = 0 #ログカントリミット(60回)
+    start_time = time.time()
+    next_time = time.time()
     psutil.cpu_percent(interval = None)
-    Sever_datas = psutil_gettemp()
+
     DB = test_DB()
     DB_cursor = DB.cursor()
-    DB_cursor.execute('''
-        INSERT INTO server_databace(
+
+    while True:
+        Sever_datas = psutil_gettemp()
+        if Sever_datas is not None:
+
+            DB_cursor.execute('''
+                INSERT INTO server_databace(
                             
-            CPU_temp , CPU_per ,
-            GPU_temp , GPU_per ,
-            RAM_temp , RAM_per ,
-            SSD_temp ,
-            LAN_temp ,
-            timestamp 
+                    CPU_temp , CPU_per ,
+                    GPU_temp , GPU_per ,
+                    RAM_temp , RAM_per ,
+                    SSD_temp ,
+                    LAN_temp ,
+                    timestamp 
  
-        )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
-    DB.commit()
-    DB_cursor.execute('SELECT * FROM server_databace')
-    #print(DB_cursor.fetchall())
+                )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
+        
+            DB.commit()
+            COUNT_LIMIT += 1
 
-    end = time.time()
+            next_time += INTERVAL_SEC
+            sleep_time = next_time - time.time()
+            if sleep_time > 0:
+                time.sleep(sleep_time)
 
-    syorizikan = end - start
+
+            if COUNT_LIMIT >= 3:
+                    DB_cursor.execute('SELECT * FROM server_databace')
+                    print(DB_cursor.fetchall())
+                    break
+        
+        elif  Sever_datas is None:
+            print(f"Sever_datas is None(While roop error)")
+            break
+    
+
+
+    end_time = time.time()
+
+    syorizikan = end_time - start_time
 
     #print({sensor_datas})
     print(f"処理時間：{syorizikan:.6f}秒")
@@ -100,3 +140,5 @@ if __name__ == "__main__":
     
     #2026/2/16 ここからCPUの温度関係をどっかの関数に移動させてreturnで返させるやつを作って帰ってきたやつをfor~inでばこばこいれてsqliteに入れるやつを作れ
     #ループ処理はそのあと作ればいいや
+
+    #2026/2/18 sqlやっとできた...
