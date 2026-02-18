@@ -1,5 +1,7 @@
 import subprocess
 import datetime
+import sqlite3
+import os
 from google.cloud import storage
 
 # 【重要】ここを自分のバケット名に書き換えてください
@@ -15,7 +17,7 @@ def get_gpu_temp():
         print(f"GPUtemp get as false...: {e}")
         return "99" # テスト用ダミー
 
-def upload_to_gcs(text_data):
+def upload_to_gcs(db_path):
     try:
         # 環境変数から認証情報を読み込み
         client = storage.Client()
@@ -25,11 +27,29 @@ def upload_to_gcs(text_data):
         filename = f'gpu_logs/temp_{now}.txt'
 
         blob = bucket.blob(filename)
-        blob.upload_from_string(f"Temperature: {text_data}C")
+        blob.upload_from_string(f"Temperature: {db_path}C")
 
         print(f"success!://{BUCKET_NAME}/{filename}")
     except Exception as e:
         print(f"false...: {e}")
+
+def daily_summary_db(db_path):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS daily_summary (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            CPU_temp REAL, CPU_per REAL,
+            GPU_temp REAL, GPU_per REAL,
+            RAM_temp REAL, RAM_per REAL,
+            SSD_temp REAL,
+            LAN_temp REAL,
+            timestamp TEXT
+        )
+    ''')
+    conn.commit()
+    return conn
 
 if __name__ == "__main__":
     print("--- GPUtemoget & starting tempupload ---")

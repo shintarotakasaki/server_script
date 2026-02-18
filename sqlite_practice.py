@@ -87,7 +87,7 @@ if __name__ == "__main__":
     INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
     COUNT_RUN = 0 #While roop カウント用
     COUNT_LIMIT = 10 #While roopカントリミット(60回)
-    start_time = time.time()
+    #start_time = time.time()
     next_time = time.time()
     psutil.cpu_percent(interval = None)
 
@@ -140,12 +140,12 @@ if __name__ == "__main__":
     
     print(f"サマリー{DB_cursor.fetchall()}")
 
-    end_time = time.time()
+    #end_time = time.time()
 
-    syorizikan = end_time - start_time
+    #syorizikan = end_time - start_time
 
     #print({sensor_datas})
-    print(f"処理時間：{syorizikan:.6f}秒")
+    #print(f"処理時間：{syorizikan:.6f}秒")
     #print("==================================")
     #print(f"CPU使用率{cpu_usage}％")
     

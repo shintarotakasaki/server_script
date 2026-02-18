@@ -1,13 +1,15 @@
 import sqlite3
 import datetime
+import os
 import main_tempget
+import sqlite_practice
 
-def rog_DB(gpu_kaeriti):
+def Daily_DB(Sever_datas):
     try:
         rogDB_conn = sqlite3.connect(':memory:')
         rogDB_cursor = rogDB_conn.cursor()
         rogDB_cursor.execute('CREATE TABLE IF NOT EXISTS temp_test (id INTEGER PRIMARY KEY AUTOINCREMENT, gpu_temp TEXT)')
-        rogDB_cursor.execute('INSERT INTO temp_test(gpu_temp) VALUES(?)',(gpu_kaeriti,))
+        rogDB_cursor.execute('INSERT INTO temp_test(gpu_temp) VALUES(?)',(Sever_datas))
         rogDB_conn.commit()
         return rogDB_conn
 
@@ -17,8 +19,8 @@ def rog_DB(gpu_kaeriti):
 
 if __name__ == "__main__":
     try:
-        gpu_temp = main_tempget.get_gpu_temp()
-        main_conn =main_tempget.rog_DB_test(gpu_temp)
+        gpu_temp = sqlite_practice.psutil_gettemp()
+        main_conn =sqlite_practice.test_DB()
         
         if main_conn is not None:
             main_cursor = main_conn.cursor()
