@@ -82,6 +82,65 @@ def psutil_gettemp():
         print(f"Psutil温度取得エラー{e}")
         return None , None , None , None , None , None , None , None , None
     
+def summary_output():
+    INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
+    COUNT_RUN = 0 #While roop カウント用
+    COUNT_LIMIT = 10 #While roopカントリミット(60回)
+    #start_time = time.time()
+    next_time = time.time()
+    psutil.cpu_percent(interval = None)
+
+    DB = test_DB()
+    DB_cursor = DB.cursor()
+
+    while True:
+        Sever_datas = psutil_gettemp()
+        if Sever_datas is not None:
+
+            DB_cursor.execute('''
+                INSERT INTO server_databace(
+                            
+                    CPU_temp , CPU_per ,
+                    GPU_temp , GPU_per ,
+                    RAM_temp , RAM_per ,
+                    SSD_temp ,
+                    LAN_temp ,
+                    timestamp 
+ 
+            )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
+        
+            DB.commit()
+            COUNT_RUN += 1
+
+            next_time += INTERVAL_SEC
+            sleep_time = next_time - time.time()
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+
+            if COUNT_RUN >= COUNT_LIMIT:
+                    DB_cursor.execute('SELECT * FROM server_databace') #print test
+                    print(DB_cursor.fetchall()) #print test
+                    break
+        
+        elif  Sever_datas is None:
+            print(f"Sever_datas is None(While roop error)")
+            break
+    
+    DB_cursor.execute('''
+        SELECT 
+
+            ROUND(AVG(CPU_temp), 1), ROUND(AVG(CPU_per), 1),
+            ROUND(AVG(GPU_temp), 1), ROUND(AVG(GPU_per), 1),
+            ROUND(AVG(RAM_temp), 1), ROUND(AVG(RAM_per), 1),
+            ROUND(AVG(SSD_temp), 1),
+            ROUND(AVG(LAN_temp), 1)
+            FROM server_databace
+
+    ''')
+
+    return DB
+
 if __name__ == "__main__":
     
     INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
@@ -108,7 +167,7 @@ if __name__ == "__main__":
                     LAN_temp ,
                     timestamp 
  
-                )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
+            )VALUES(?,?,?,?,?,?,?,?,?)''',Sever_datas)
         
             DB.commit()
             COUNT_RUN += 1
@@ -129,16 +188,19 @@ if __name__ == "__main__":
             break
     
     DB_cursor.execute('''
-                    SELECT 
-                        ROUND(AVG(CPU_temp), 1), ROUND(AVG(CPU_per), 1),
-                        ROUND(AVG(GPU_temp), 1), ROUND(AVG(GPU_per), 1),
-                        ROUND(AVG(RAM_temp), 1), ROUND(AVG(RAM_per), 1),
-                        ROUND(AVG(SSD_temp), 1),
-                        ROUND(AVG(LAN_temp), 1)
-                    FROM server_databace
-                ''')
+        SELECT 
+
+            ROUND(AVG(CPU_temp), 1), ROUND(AVG(CPU_per), 1),
+            ROUND(AVG(GPU_temp), 1), ROUND(AVG(GPU_per), 1),
+            ROUND(AVG(RAM_temp), 1), ROUND(AVG(RAM_per), 1),
+            ROUND(AVG(SSD_temp), 1),
+            ROUND(AVG(LAN_temp), 1)
+            FROM server_databace
+
+    ''')
     
-    print(f"サマリー{DB_cursor.fetchall()}")
+    
+    #print(f"サマリー{DB_cursor.fetchall()}")
 
     #end_time = time.time()
 
