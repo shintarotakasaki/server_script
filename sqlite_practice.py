@@ -82,7 +82,8 @@ def psutil_gettemp():
         print(f"Psutil温度取得エラー{e}")
         return None , None , None , None , None , None , None , None , None
     
-def summary_output():
+def summary_output(DB):
+    
     INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
     COUNT_RUN = 0 #While roop カウント用
     COUNT_LIMIT = 10 #While roopカントリミット(60回)
@@ -90,7 +91,6 @@ def summary_output():
     next_time = time.time()
     psutil.cpu_percent(interval = None)
 
-    DB = test_DB()
     DB_cursor = DB.cursor()
 
     while True:
@@ -140,6 +140,8 @@ def summary_output():
     ''')
 
     return DB
+
+    
 
 if __name__ == "__main__":
     
@@ -198,6 +200,7 @@ if __name__ == "__main__":
             FROM server_databace
 
     ''')
+
     
     
     #print(f"サマリー{DB_cursor.fetchall()}")
