@@ -53,6 +53,12 @@ def daily_summary_db(db_path):
     return conn
 
 if __name__ == "__main__":
+    """
     dir_path = "/home/admin-user/server_script/Server_log_dir"
     dir_dbpath = "/home/admin-user/server_script/Server_log_dir/test_summary.db"
     daily_summary_db(dir_dbpath)
+    """
+
+    data = sqlite_practice.psutil_gettemp
+    summary = sqlite_practice.summary_output(data)
+    print(f"タプル{summary}")
