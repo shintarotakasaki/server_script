@@ -139,7 +139,11 @@ def summary_output(DB):
 
     ''')
 
-    return DB
+    summary_data = DB_cursor.fetchone()
+    DB_cursor.execete('DELETE FROM server_databace')
+    DB.commit()
+
+    return summary_data
 
     
 

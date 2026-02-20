@@ -3,6 +3,7 @@ import datetime
 import sqlite3
 import os
 from google.cloud import storage
+import sqlite_practice
 
 # 【重要】ここを自分のバケット名に書き換えてください
 BUCKET_NAME = 'linux-server-1'
