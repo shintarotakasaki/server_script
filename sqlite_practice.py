@@ -119,8 +119,8 @@ def summary_output(DB):
 
 
             if COUNT_RUN >= COUNT_LIMIT:
-                    DB_cursor.execute('SELECT * FROM server_databace') #print test
-                    print(DB_cursor.fetchall()) #print test
+                    #DB_cursor.execute('SELECT * FROM server_databace') #print test
+                    #print(DB_cursor.fetchall()) #print test
                     break
         
         elif  Sever_datas is None:
@@ -138,9 +138,9 @@ def summary_output(DB):
             FROM server_databace
 
     ''')
-
+    
     summary_data = DB_cursor.fetchone()
-    DB_cursor.execete('DELETE FROM server_databace')
+    DB_cursor.execute('DELETE FROM server_databace')
     DB.commit()
 
     return summary_data

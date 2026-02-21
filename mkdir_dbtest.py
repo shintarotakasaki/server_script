@@ -2,6 +2,7 @@ import subprocess
 import datetime
 import sqlite3
 import os
+import time
 from google.cloud import storage
 import sqlite_practice
 
@@ -58,7 +59,11 @@ if __name__ == "__main__":
     dir_dbpath = "/home/admin-user/server_script/Server_log_dir/test_summary.db"
     daily_summary_db(dir_dbpath)
     """
-
-    data = sqlite_practice.psutil_gettemp
-    summary = sqlite_practice.summary_output(data)
+    start_time = time.time()
+    databace = sqlite_practice.test_DB()
+    summary = sqlite_practice.summary_output(databace)
     print(f"タプル{summary}")
+    
+    end_time = time.time()
+    syorizikan = end_time - start_time
+    print(f"処理時間：{syorizikan:.6f}秒")
