@@ -86,7 +86,7 @@ def summary_output(DB):
     
     INTERVAL_SEC = 1.0 #ログ取得間隔(1秒毎)
     COUNT_RUN = 0 #While roop カウント用
-    COUNT_LIMIT = 10 #While roopカントリミット(60回)
+    COUNT_LIMIT = 60 #While roopカントリミット(60回)
     #start_time = time.time()
     next_time = time.time()
     psutil.cpu_percent(interval = None)
